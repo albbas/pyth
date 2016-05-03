@@ -236,9 +236,11 @@ class DocBuilder(object):
             self.block = document.Paragraph()
         
         if self.isImage:
+            self.block = document.Image()
+            run = u"".join(self.run).encode('ascii')
             self.block.content.append(
                 document.Image(self.propStack[-1].copy(),
-                               [b"".join(self.run)]))
+                               [run]))
             self.isImage = False
         else:
             self.block.content.append(

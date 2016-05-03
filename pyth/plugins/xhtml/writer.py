@@ -47,7 +47,8 @@ class XHTMLWriter(PythWriter):
         self.pretty = pretty
         self.paragraphDispatch = {
             document.List: self._list,
-            document.Paragraph: self._paragraph
+            document.Paragraph: self._paragraph,
+            document.Image: self._image,
         }
         
 
@@ -123,6 +124,9 @@ class XHTMLWriter(PythWriter):
 
         return tag
 
+    def _image(self, input_string):
+        '''Ignore images'''
+        return [Tag(None)]
 
 
 _prettyBreak = object()
