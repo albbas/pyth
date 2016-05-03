@@ -8,7 +8,6 @@ import subprocess
 import tempfile
 import os
 import sys
-import BeautifulSoup
 
 from pyth.plugins.latex.writer import LatexWriter
 from pyth.plugins.python.reader import *

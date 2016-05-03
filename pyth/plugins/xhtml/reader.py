@@ -3,7 +3,7 @@ Read documents from xhtml
 """
 from __future__ import absolute_import
 
-import BeautifulSoup
+import bs4
 
 from pyth import document
 from pyth.format import PythReader
@@ -25,10 +25,7 @@ class XHTMLReader(PythReader):
         self.link_callback = link_callback
 
     def go(self):
-        soup = BeautifulSoup.BeautifulSoup(self.source,
-                                           convertEntities=BeautifulSoup.BeautifulSoup.HTML_ENTITIES,
-                                           fromEncoding=self.encoding,
-                                           smartQuotesTo=None)
+        soup = bs4.BeautifulSoup(self.source, from_encoding=self.encoding)
         # Make sure the document content doesn't use multi-lines
         soup = self.format(soup)
         doc = document.Document()
@@ -49,21 +46,21 @@ class XHTMLReader(PythReader):
         rendering once this step has been done.
         """
         # Remove all the newline characters before a closing tag.
-        for node in soup.findAll(text=True):
+        for node in soup.find_all(text=True):
             if node.rstrip(" ").endswith("\n"):
-                node.replaceWith(node.rstrip(" ").rstrip("\n"))
+                node.replace_with(node.rstrip(" ").rstrip("\n"))
         # Join the block elements lines into a single long line
         for tag in ['p', 'li']:
-            for node in soup.findAll(tag):
+            for node in soup.find_all(tag):
                 text = six.text_type(node)
                 lines = [x.strip() for x in text.splitlines()]
                 text = ' '.join(lines)
-                node.replaceWith(BeautifulSoup.BeautifulSoup(text))
-        soup = BeautifulSoup.BeautifulSoup(six.text_type(soup))
+                node.replace_with(bs4.BeautifulSoup(text))
+        soup = bs4.BeautifulSoup(six.text_type(soup))
         # replace all <br/> tag by newline character
-        for node in soup.findAll('br'):
-            node.replaceWith("\n")
-        soup = BeautifulSoup.BeautifulSoup(six.text_type(soup))
+        for node in soup.find_all('br'):
+            node.replace_with("\n")
+        soup = bs4.BeautifulSoup(six.text_type(soup))
         return soup
 
     def is_bold(self, node):
@@ -71,7 +68,7 @@ class XHTMLReader(PythReader):
         Return true if the BeautifulSoup node needs to be rendered as
         bold.
         """
-        return (node.findParent(['b', 'strong']) is not None or
+        return (node.find_parent(['b', 'strong']) is not None or
                 self.css.is_bold(node))
 
     def is_italic(self, node):
@@ -79,7 +76,7 @@ class XHTMLReader(PythReader):
         Return true if the BeautifulSoup node needs to be rendered as
         italic.
         """
-        return (node.findParent(['em', 'i']) is not None
+        return (node.find_parent(['em', 'i']) is not None
                 or self.css.is_italic(node))
 
     def is_sub(self, node):
@@ -87,7 +84,7 @@ class XHTMLReader(PythReader):
         Return true if the BeautifulSoup node needs to be rendered as
         sub.
         """
-        return (node.findParent(['sub']) is not None
+        return (node.find_parent(['sub']) is not None
                 or self.css.is_sub(node))
 
     def is_super(self, node):
@@ -95,7 +92,7 @@ class XHTMLReader(PythReader):
         Return true if the BeautifulSoup node needs to be rendered as
         super.
         """
-        return (node.findParent(['sup']) is not None
+        return (node.find_parent(['sup']) is not None
                 or self.css.is_super(node))
 
     def url(self, node):
@@ -103,7 +100,7 @@ class XHTMLReader(PythReader):
         return the url of a BeautifulSoup node or None if there is no
         url.
         """
-        a_node = node.findParent('a')
+        a_node = node.find_parent('a')
         if not a_node:
             return None
 
@@ -143,7 +140,7 @@ class XHTMLReader(PythReader):
         Process a BeautifulSoup node and fill its elements into a pyth
         base object.
         """
-        if isinstance(node, BeautifulSoup.NavigableString):
+        if isinstance(node, bs4.NavigableString):
             text = self.process_text(node)
             if text:
                 obj.append(text)
