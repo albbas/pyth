@@ -6,7 +6,11 @@ reStructuredText writer output.
 """
 from __future__ import absolute_import
 
-from cStringIO import StringIO
+try:
+    from cStringIO import StringIO
+except ImportError:
+    from io import StringIO
+
 import docutils.core
 
 from pyth import document

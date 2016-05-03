@@ -3,7 +3,10 @@ Render documents as Reportlab PDF stories
 """
 from __future__ import absolute_import
 
-from cStringIO import StringIO
+try:
+    from cStringIO import StringIO
+except ImportError:
+    from io import StringIO
 import cgi # For escape()
 
 from pyth import document
@@ -32,7 +35,7 @@ class PDFWriter(PythWriter):
     def write(klass, document, target=None, paragraphStyle=None):
         writer = PDFWriter(document, paragraphStyle)
         story = writer.go()
-        
+
         if target is None:
             target = StringIO()
 
@@ -60,7 +63,7 @@ class PDFWriter(PythWriter):
         for para in self.document.content:
             self._dispatch(para)
         return self.paragraphs
-            
+
 
     def _dispatch(self, para, level=0, **kw):
         handler = self.paragraphDispatch[type(para)]
@@ -101,11 +104,11 @@ class PDFWriter(PythWriter):
 
         for para in entry.content:
 
-            if first: 
+            if first:
                 bullet = BULLET_TEXT
                 self.paragraphStyle.leftIndent = LIST_INDENT * level
                 self.paragraphStyle.bulletIndent = (LIST_INDENT * level - 1) + BULLET_INDENT
-            else: 
+            else:
                 bullet = None
                 self.paragraphStyle.leftIndent = LIST_INDENT * (level + 1)
 
